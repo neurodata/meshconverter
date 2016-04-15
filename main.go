@@ -113,6 +113,29 @@ func RunMarchingCubes(v VoxelGrid, zVoxelRes float32, outputdir string, resoluti
   return g
 }
 
+func processLabel(v VoxelGrid, label uint, zVoxelRes float32, scalingLevels uint, outputdir string) {
+  newgrid := v.Mask( uint32(label) )
+
+  // handle the base resolution first
+  _ = RunMarchingCubes(newgrid, zVoxelRes, outputdir, 0)
+
+  // for now marchingcubes writes the geometry to disk
+
+  // then downsample to create the resolution hierarchy
+  for i := uint(0); i < scalingLevels; i++ {
+    newgrid = DownsampleGrid(newgrid)
+    // run marching cubes
+    //zVoxelRes = zVoxelRes / 2.0
+    _ = RunMarchingCubes(newgrid, zVoxelRes, outputdir, int(i + 1))
+    // eventually, write the geometry to disk or pass it to another program
+    // for now, marchingcubes writes the geometry to disk for us
+    //newgrid.Write(*outputdirFlag)
+  }
+
+  //maskedgrid.Write(*outputdirFlag)
+
+}
+
 func main() {
   // profiling
   if cpuprofile == true {
@@ -153,10 +176,13 @@ func main() {
   if *labelFlag == 0 {
     labels := voxelgrid.Labels()
     for _, label := range labels {
-      // AB TODO
-      fmt.Println(label)
+      processLabel(voxelgrid, uint(label), float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
     }
   } else {
+
+      processLabel(voxelgrid, *labelFlag, float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
+
+      /*
       maskedgrid := voxelgrid.Mask( uint32(*labelFlag) )
 
       // handle the base resolution first
@@ -164,8 +190,9 @@ func main() {
       // for now marchingcubes writes the geometry to disk
 
       // then downsample to create the resolution hierarchy
+      newgrid := maskedgrid
       for i := uint(0); i < *resFlag; i++ {
-        newgrid := DownsampleGrid(maskedgrid)
+        newgrid := DownsampleGrid(newgrid)
         // run marching cubes
         _ = RunMarchingCubes(newgrid, float32(*zVoxelResFlag), *outputdirFlag, int(i + 1))
         // eventually, write the geometry to disk or pass it to another program
@@ -174,6 +201,7 @@ func main() {
       }
 
       //maskedgrid.Write(*outputdirFlag)
+      */
   }
   return
 

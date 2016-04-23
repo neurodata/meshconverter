@@ -15,7 +15,7 @@ type VoxelGrid struct {
 }
 
 /* Val returns the value at the specified point */
-func (v VoxelGrid) Val(x, y, z uint32) uint32 {
+func (v *VoxelGrid) Val(x, y, z uint32) uint32 {
 	if x >= v.dims[0] || y >= v.dims[1] || z >= v.dims[2] {
 		panic(fmt.Sprintf("ERROR: Requested index %d,%d,%d is out of range! (dims: %d, %d, %d)", x, y, z, v.dims[0], v.dims[1], v.dims[2]))
 	}
@@ -23,7 +23,7 @@ func (v VoxelGrid) Val(x, y, z uint32) uint32 {
 }
 
 /* SetVal allows the user to set a value in the VoxelGrid using the (x,y,z) coordinate */
-func (v VoxelGrid) SetVal(x, y, z uint32, val uint32) {
+func (v *VoxelGrid) SetVal(x, y, z uint32, val uint32) {
 	if x >= v.dims[0] || y >= v.dims[1] || z >= v.dims[2] {
 		panic(fmt.Sprintf("ERROR: Requested index %d,%d,%d is out of range! (dims: %d, %d, %d)", x, y, z, v.dims[0], v.dims[1], v.dims[2]))
 	}
@@ -31,7 +31,7 @@ func (v VoxelGrid) SetVal(x, y, z uint32, val uint32) {
 }
 
 /* Labels returns a list of unique labels in the VoxelGrid */
-func (v VoxelGrid) Labels() []uint32 {
+func (v *VoxelGrid) Labels() []uint32 {
 	label_map := make(map[uint32]bool) // label_map[label] = true/false
 	for _, val := range v.data {
 		if label_map[val] != true {
@@ -49,7 +49,7 @@ func (v VoxelGrid) Labels() []uint32 {
 }
 
 /* Mask takes an input label and returns a new VoxelGrid with the mask applied */
-func (v VoxelGrid) Mask(label uint32) VoxelGrid {
+func (v *VoxelGrid) Mask(label uint32) VoxelGrid {
 	maskbuf := make([]uint32, v.dims[0]*v.dims[1]*v.dims[2])
 	mask := VoxelGrid{v.dims, maskbuf, label}
 	for idx, val := range v.data {
@@ -62,7 +62,7 @@ func (v VoxelGrid) Mask(label uint32) VoxelGrid {
 
 /* Write takes the input VoxelGrid, which we expect to be uint32, and writes it
    to disk as a floating point array in binary, casting to float as we go. */
-func (v VoxelGrid) Write(filepath string) {
+func (v *VoxelGrid) Write(filepath string) {
 	f, err := os.Create(filepath)
 	checkError(err)
 	defer f.Close()

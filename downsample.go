@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	// temp
+	//"os"
+	//"runtime/pprof"
 )
 
 func DownsampleGrid(v VoxelGrid) VoxelGrid {
@@ -18,7 +21,6 @@ func DownsampleGrid(v VoxelGrid) VoxelGrid {
 	for z := uint32(0); z < newdims[2]; z++ {
 		for y := uint32(0); y < newdims[1]; y++ {
 			for x := uint32(0); x < newdims[0]; x++ {
-
 				// check the surrounding values of the voxel grid
 				func(x uint32, y uint32, z uint32) {
 					for zz := -1; zz <= 1; zz++ {
@@ -42,12 +44,14 @@ func DownsampleGrid(v VoxelGrid) VoxelGrid {
 						}
 					}
 					// newgrid isn't zeroed by default, and by setting the value here we avoid a copy above
-					newgrid.SetVal(x, y, z, 0)
+					// AB TODO -- turns out newgrid is zeroed by default!
+					//newgrid.SetVal(x, y, z, 0)
 					return
 				}(x, y, z)
 
 			}
 		}
 	}
+
 	return newgrid
 }

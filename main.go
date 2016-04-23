@@ -18,7 +18,7 @@ import (
 )
 
 // enable / disable profiling
-var cpuprofile bool = false
+var cpuprofile bool = true
 
 func checkError(e error) {
   if e != nil {
@@ -113,7 +113,7 @@ func RunMarchingCubes(v VoxelGrid, zVoxelRes float32, outputdir string, resoluti
   return g
 }
 
-func processLabel(v VoxelGrid, label uint, zVoxelRes float32, scalingLevels uint, outputdir string) {
+func ProcessLabel(v VoxelGrid, label uint, zVoxelRes float32, scalingLevels uint, outputdir string) {
   newgrid := v.Mask( uint32(label) )
 
   // handle the base resolution first
@@ -124,6 +124,7 @@ func processLabel(v VoxelGrid, label uint, zVoxelRes float32, scalingLevels uint
   // then downsample to create the resolution hierarchy
   for i := uint(0); i < scalingLevels; i++ {
     newgrid = DownsampleGrid(newgrid)
+
     // run marching cubes
     //zVoxelRes = zVoxelRes / 2.0
     _ = RunMarchingCubes(newgrid, zVoxelRes, outputdir, int(i + 1))
@@ -176,11 +177,11 @@ func main() {
   if *labelFlag == 0 {
     labels := voxelgrid.Labels()
     for _, label := range labels {
-      processLabel(voxelgrid, uint(label), float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
+      ProcessLabel(voxelgrid, uint(label), float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
     }
   } else {
 
-      processLabel(voxelgrid, *labelFlag, float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
+      ProcessLabel(voxelgrid, *labelFlag, float32(*zVoxelResFlag), *resFlag, *outputdirFlag)
 
       /*
       maskedgrid := voxelgrid.Mask( uint32(*labelFlag) )
@@ -204,8 +205,15 @@ func main() {
       */
   }
   return
-
-
-
-
 }
+
+/*
+// BEGIN profile heap
+f, err := os.Create("memprofile.prof")
+checkError(err)
+
+pprof.WriteHeapProfile(f)
+f.Close()
+os.Exit(1)
+// END profile heap
+*/

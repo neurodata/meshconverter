@@ -124,7 +124,6 @@ func ProcessLabel(v VoxelGrid, label uint, zVoxelRes float32, scalingLevels uint
   // then downsample to create the resolution hierarchy
   for i := uint(0); i < scalingLevels; i++ {
     newgrid = DownsampleGrid(newgrid)
-
     // run marching cubes
     //zVoxelRes = zVoxelRes / 2.0
     _ = RunMarchingCubes(newgrid, zVoxelRes, outputdir, int(i + 1))

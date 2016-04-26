@@ -18,7 +18,7 @@ import (
 )
 
 // enable / disable profiling
-var cpuprofile bool = true
+var cpuprofile bool = false
 
 func checkError(e error) {
   if e != nil {
